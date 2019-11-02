@@ -10,8 +10,6 @@ apt update -y && \
         tree \
         zsh \
         htop \
-        default-jdk \
-        openjfx \
         curl \
         sudo
 
