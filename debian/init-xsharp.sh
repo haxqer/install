@@ -15,10 +15,10 @@ apt update -y && \
         curl \
         sudo
 
-haxqer_key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC2xwdBPeyJaJgddhu4cmYD2/s70Q/WeOrWqzEre3R90FTtjZtsBkx62oTiX+10gL/ZS3P4HGdkiHty2yV0SLJtpaP+ZCVu1aJyIoZrjHGAZNsJGD6ocPlnY47pmZERHxEebpQrJYzdUye2T7wIRZ+kkjHAcOkIclHQPanf/rVjpvQJ1yqaKS9zGHnEDFaptvHbDJQNS2NhhM0/NgLHHLxpIx4uHj6wMRdbkisiSyQhkDRne2SNE+TBV/w98vQIOff0n2wMlo8JV/kRdRBtBq35FOl0CiihNe5bhUlQWvqPgDqyUTJ9CARIk3+lwJjDPS5gB4Ba3N2j0HTYqW9XEN1r haxqer"
+xsharp_key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDCy5SN7sEpZwF2XRtcOt7HlO8mPiYktjNgCHGdJ43eNtNVNmNKjABtCSdRKvxUmdd8NMnmlnbFcMbmVjnljiHhT/Y+Kn7Li0vLG0qKRZIyBkuVOAM4HRUsqRnRNcsw/dHzfKs6kX83sP3HOeckIyso12oJEw8o7uJkO0kM1Bcqc/QwnucAB+MtwJ5hvbEB09B9yuSieMyci3btR5MH7KYHBMv4A986/pvsrj3XUmyTv5INPTCbL5Zku3QroizePZ58ZGwwyN5e0+gfNnhPZLmvA8B9lajOZxl2x2qyEwLdFvNbeYXUJn0kU1lgCCq3xLW+lEUvgdOkqVLiwW5fVZWR xsharp@gmail.com"
 
 mkdir -p ~/.ssh
-echo ${haxqer_key} >> ~/.ssh/authorized_keys
+echo ${xsharp_key} >> ~/.ssh/authorized_keys
 
 # docker
 apt-get update -y \
