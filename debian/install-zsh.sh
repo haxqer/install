@@ -139,13 +139,13 @@ setup_shell() {
 	echo "${BLUE}Time to change your default shell to zsh:${RESET}"
 
 	# Prompt for user choice on changing the default login shell
-	printf "${YELLOW}Do you want to change your default shell to zsh? [Y/n]${RESET} "
-	read opt
-	case $opt in
-		y*|Y*|"") echo "Changing the shell..." ;;
-		n*|N*) echo "Shell change skipped."; return ;;
-		*) echo "Invalid choice. Shell change skipped."; return ;;
-	esac
+#	printf "${YELLOW}Do you want to change your default shell to zsh? [Y/n]${RESET} "
+#	read opt
+#	case $opt in
+#		y*|Y*|"") echo "Changing the shell..." ;;
+#		n*|N*) echo "Shell change skipped."; return ;;
+#		*) echo "Invalid choice. Shell change skipped."; return ;;
+#	esac
 
 	# Check if we're running on Termux
 	case "$PREFIX" in
