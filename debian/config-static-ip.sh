@@ -128,6 +128,7 @@ gateway ${GATEWAY}
 
 " > /etc/network/interfaces
     service networking restart
+    ip a
 }
 
 
