@@ -154,8 +154,4 @@ main(){
 main "$@"
 
 
-#
-#service networking restart
-
-
 

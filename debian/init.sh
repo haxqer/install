@@ -17,6 +17,5 @@ ${DIR}/install-docker.sh
 ${DIR}/install-docker-compose.sh
 
 
-#zsh
-#sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
+# zsh
 ${DIR}/install-zsh.sh
