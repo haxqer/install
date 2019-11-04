@@ -19,6 +19,7 @@ apt update -y && \
         jq \
         apache2-utils \
         open-vm-tools \
+        bash-completion \
         sudo
 
 
