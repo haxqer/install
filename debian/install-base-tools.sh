@@ -17,6 +17,7 @@ apt update -y && \
         ipset \
         jq \
         apache2-utils \
+        open-vm-tools \
         sudo
 
 
