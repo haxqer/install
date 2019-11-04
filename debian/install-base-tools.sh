@@ -4,6 +4,7 @@ apt update -y && \
     apt install -y \
         htop \
         net-tools \
+        dnsutils \
         sysstat \
         dstat \
         git \
