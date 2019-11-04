@@ -2,6 +2,8 @@
 
 # linux 内核调优
 
+# /etc/sysctl.conf 可设置的选项很多，其它选项可以根据自己的环境需要进行设置
+
 echo "
 #该参数设置系统的TIME_WAIT的数量，如果超过默认值则会被立即清除
 net.ipv4.tcp_max_tw_buckets = 20000
@@ -23,11 +25,22 @@ sysctl -p
 
 
 
-# open files
+# 打开文件数
+# 设置系统打开文件数设置，解决高并发下 too many open files 问题。此选项直接影响单个进程容纳的客户端连接数。
+# Soft open files 是Linux系统参数，影响系统单个进程能够打开最大的文件句柄数量，这个值会影响到长连接应用如聊天中单个进程能够维持的用户连接数，
+# 运行ulimit -n能看到这个参数值，如果是1024，就是代表单个进程只能同时最多只能维持1024甚至更少（因为有其它文件的句柄被打开）。
+# 如果开启4个进程维持用户连接，那么整个应用能够同时维持的连接数不会超过4*1024个，
+# 也就是说最多只能支持4x1024个用户在线可以增大这个设置以便服务能够维持更多的TCP连接。
+
+
+# 在/etc/profile文件末尾添加一行ulimit -HSn 102400，这样每次登录终端时，都会自动执行/etc/profile。
 
 echo "
 ulimit -HSn 102400
 " >> /etc/profile
+
+# 令修改open files的数值永久生效，则必须修改配置文件：/etc/security/limits.conf. 在这个文件后加上相应的配置，这种方法需要重启机器才能生效
+
 echo "
 * soft nofile 1024000
 * hard nofile 1024000
