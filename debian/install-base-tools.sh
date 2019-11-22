@@ -20,6 +20,7 @@ apt update -y && \
         apache2-utils \
         open-vm-tools \
         bash-completion \
+        openssh-server \
         sudo
 
 
