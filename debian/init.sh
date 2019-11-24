@@ -19,3 +19,7 @@ ${DIR}/install-docker-compose.sh
 
 # zsh
 ${DIR}/install-zsh.sh
+
+
+# some images
+${DIR}/pull-k8s-images.sh
