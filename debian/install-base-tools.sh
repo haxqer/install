@@ -21,7 +21,8 @@ apt update -y && \
         open-vm-tools \
         bash-completion \
         openssh-server \
-        sudo
+        sudo \
+        unzip
 
 
 
