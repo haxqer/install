@@ -105,6 +105,8 @@ setup_ip() {
 }
 
 setup_config_file() {
+  NEW_UUID_1=$(cat /dev/urandom | tr -dc 'a-f0-9' | fold -w 8 | head -n 1)
+  NEW_UUID_2=$(cat /dev/urandom | tr -dc 'a-f0-9' | fold -w 12 | head -n 1)
     echo "
 TYPE="Ethernet"
 PROXY_METHOD="none"
@@ -118,7 +120,7 @@ IPV6_DEFROUTE="yes"
 IPV6_FAILURE_FATAL="no"
 IPV6_ADDR_GEN_MODE="stable-privacy"
 NAME="ens192"
-UUID="9052976b-45d8-4357-b502-ff106a59004a"
+UUID="${NEW_UUID_1}-45d8-4357-b502-${NEW_UUID_2}"
 DEVICE="ens192"
 ONBOOT="yes"
 IPADDR="${IPV4}"
