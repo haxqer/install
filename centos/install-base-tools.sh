@@ -13,5 +13,6 @@ yum update -y && \
         ipset \
         open-vm-tools \
         bash-completion \
+        nfs-common \
         unzip
 
