@@ -14,5 +14,6 @@ yum update -y && \
         open-vm-tools \
         bash-completion \
         nfs-common \
-        unzip
+        unzip \
+        g++
 
