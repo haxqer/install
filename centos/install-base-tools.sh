@@ -15,5 +15,6 @@ yum update -y && \
         bash-completion \
         nfs-common \
         unzip \
-        g++
+        g++ \
+        nethogs
 
