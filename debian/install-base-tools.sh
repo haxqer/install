@@ -22,6 +22,7 @@ apt update -y && \
         bash-completion \
         openssh-server \
         sudo \
+        nethogs \
         unzip
 
 
