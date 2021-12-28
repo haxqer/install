@@ -2,15 +2,14 @@
 
 apt-get update -y \
 && apt-get install -y \
-    apt-transport-https \
     ca-certificates \
     curl \
-    gnupg2 \
-    software-properties-common \
-&& curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -  \
-&& add-apt-repository \
-   "deb [arch=amd64] https://mirrors.aliyun.com/docker-ce/linux/debian \
-   $(lsb_release -cs) \
-   stable" \
+    gnupg \
+    lsb-release \
+&& curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
+&& echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
+  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
 && apt-get update -y \
-&& apt-get install -y docker-ce docker-ce-cli containerd.io
+&& apt-get install -y docker-ce docker-ce-cli containerd.io \
+&& docker run hello-world
