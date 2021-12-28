@@ -1,25 +1,112 @@
 #!/bin/bash
 
-apt-get update -y \
-&& apt-get install -y openssl \
-&& mkdir -p /etc/trojan \
-&& openssl req -newkey rsa:4096 \
-            -x509 \
-            -sha256 \
-            -days 3650 \
-            -nodes \
-            -out /etc/trojan/1.crt \
-            -keyout /etc/trojan/1.key
+setup_color() {
+	# Only use colors if connected to a terminal
+	if [[ -t 1 ]]; then
+		RED=$(printf '\033[31m')
+		GREEN=$(printf '\033[32m')
+		YELLOW=$(printf '\033[33m')
+		BLUE=$(printf '\033[34m')
+		BOLD=$(printf '\033[1m')
+		RESET=$(printf '\033[m')
+	else
+		RED=""
+		GREEN=""
+		YELLOW=""
+		BLUE=""
+		BOLD=""
+		RESET=""
+	fi
+}
 
-cat > /etc/trojan/config.json <<EOF
+base_install() {
+  apt-get update -y \
+  && apt-get install -y openssl sed \
+  && mkdir -p /etc/trojan \
+  && openssl req -newkey rsa:4096 \
+    -x509 \
+    -sha256 \
+    -days 3650 \
+    -nodes \
+    -out /etc/trojan/1.crt \
+    -keyout /etc/trojan/1.key
+}
+
+valid_port(){
+    local  port=$1
+    local  stat=1
+
+    if [[ ${port} =~ ^[0-9]{1,5}$ ]]; then
+        [[ $port -le 65535  ]]
+        stat=$?
+    fi
+    return ${stat}
+}
+
+valid_password(){
+    local  password=$1
+    local  stat=1
+
+    if [[ ${password} =~ ^[0-9a-zA-Z*#_\&-]{1,40}$ ]]; then
+        stat=$?
+    fi
+    return ${stat}
+}
+
+setup_port(){
+  local stat=0
+  local port=""
+
+  while [[ ${stat} == 0 ]]; do
+    printf "${YELLOW}Port:${RESET} "
+    read port
+    if valid_port ${port} ; then
+        stat=1
+    else
+        printf "${RED}Invalid value enterd: ${BLUE}${port} ${RESET} \n"
+    fi
+  done
+
+  PORT=${port}
+}
+
+setup_password(){
+  local stat=0
+  local password=""
+
+  while [[ ${stat} == 0 ]]; do
+    printf "${YELLOW}Password:${RESET} "
+    read password
+    if valid_password ${password} ; then
+        stat=1
+    else
+        printf "${RED}Invalid value enterd: ${BLUE}${password} ${RESET} \n"
+    fi
+  done
+
+  PASSWORD=${password}
+}
+
+setup_port_password(){
+  setup_port
+  setup_password
+
+#  echo ${PORT}
+#  echo ${PASSWORD}
+}
+
+setup_config_file() {
+  local config_file_path="/etc/trojan/config.json"
+
+  cat > ${config_file_path} <<EOF
 {
     "run_type": "server",
     "local_addr": "0.0.0.0",
-    "local_port": 2222,
+    "local_port": HAXQER_REPLACE_PORT,
     "remote_addr": "127.0.0.1",
     "remote_port": 11111,
     "password": [
-        "**************"
+        "HAXQER_REPLACE_PASSWORD"
     ],
     "log_level": 1,
     "ssl": {
@@ -57,6 +144,33 @@ cat > /etc/trojan/config.json <<EOF
     }
 }
 EOF
+  sed -i "s/HAXQER_REPLACE_PORT/${PORT}/g" "${config_file_path}"
+  sed -i "s/HAXQER_REPLACE_PASSWORD/${PASSWORD}/g" "${config_file_path}"
+  docker stop trojan >/dev/null 2>&1
+  docker rm trojan >/dev/null 2>&1
+  docker run -d -p "${PORT}":"${PORT}" --name trojan --restart=always -v /etc/trojan:/etc/trojan teddysun/trojan
+}
+
+main(){
+  setup_color
+
+  echo "${BLUE}Time to set your trojan:${RESET}"
+
+  # Prompt for user choice on changing the ip configure
+  printf "${YELLOW}Do you want to set your trojan? [Y/n]${RESET} "
+  read opt
+    case $opt in
+    y*|Y*|"") echo "Set trojan..." ;;
+    n*|N*) echo "Trojan setting skipped."; return ;;
+    *) echo "Invalid choice. Trojan setting skipped."; return ;;
+  esac
+
+  base_install
+  setup_port_password
+  setup_config_file
+}
+
+main "$@"
 
 
-# docker run -d -p 11111:11111 --name trojan --restart=always -v /etc/trojan:/etc/trojan teddysun/trojan
+
