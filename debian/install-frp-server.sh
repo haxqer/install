@@ -31,7 +31,7 @@ SYSTEMDPREFIX=/etc/systemd/system
 
 BINARYPATH="${INSTALLPREFIX}/bin/${NAME}s"
 CONFIGPATH="${INSTALLPREFIX}/etc/${NAME}/frps.ini"
-SYSTEMDPATH="${SYSTEMDPREFIX}/${NAME}.service"
+SYSTEMDPATH="${SYSTEMDPREFIX}/${NAME}s.service"
 
 echo Entering temp directory ${TMPDIR}...
 cd "${TMPDIR}"
@@ -69,7 +69,7 @@ ExecStart="$BINARYPATH" -c "$CONFIGPATH"
 ExecReload=/bin/kill -HUP \$MAINPID
 LimitNOFILE=51200
 Restart=on-failure
-RestartSec=3s
+RestartSec=1s
 
 [Install]
 WantedBy=multi-user.target
