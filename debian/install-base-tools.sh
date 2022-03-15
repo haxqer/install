@@ -23,7 +23,9 @@ apt update -y && \
         openssh-server \
         sudo \
         nethogs \
-        unzip
+        unzip \
+        polipo \
+        proxychains
 
 
 
