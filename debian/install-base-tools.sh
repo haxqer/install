@@ -25,7 +25,8 @@ apt update -y && \
         nethogs \
         unzip \
         polipo \
-        proxychains
+        proxychains \
+        screen
 
 
 
