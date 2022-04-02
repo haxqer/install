@@ -26,7 +26,8 @@ apt update -y && \
         unzip \
         polipo \
         proxychains \
-        screen
+        screen \
+        lvm2
 
 
 
