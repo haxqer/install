@@ -27,7 +27,9 @@ apt update -y && \
         polipo \
         proxychains \
         screen \
-        lvm2
+        lvm2 \
+        socat \
+        ebtables
 
 
 
