@@ -16,5 +16,7 @@ yum update -y && \
         nfs-common \
         unzip \
         g++ \
-        nethogs
+        nethogs \
+        screen \
+        yum-utils
 
