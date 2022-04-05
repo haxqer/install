@@ -22,7 +22,7 @@ setup_color() {
 base_install() {
   apt-get update -y \
   && apt-get install -y openssl sed \
-  && mkdir -p /etc/trojan \
+  mkdir -p /etc/trojan \
   && openssl req -newkey rsa:4096 \
     -x509 \
     -sha256 \
@@ -97,7 +97,6 @@ setup_port_password(){
 
 setup_config_file() {
   local config_file_path="/etc/trojan/config.json"
-  mkdir -p /etc/trojan && touch ${config_file_path}
 
   cat > ${config_file_path} <<EOF
 {
