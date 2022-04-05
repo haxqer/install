@@ -97,6 +97,7 @@ setup_port_password(){
 
 setup_config_file() {
   local config_file_path="/etc/trojan/config.json"
+  mkdir -p /etc/trojan && touch ${config_file_path}
 
   cat > ${config_file_path} <<EOF
 {
