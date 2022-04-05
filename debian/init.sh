@@ -22,4 +22,4 @@ ${DIR}/install-zsh.sh
 
 
 # some images
-${DIR}/pull-k8s-images.sh
+#${DIR}/pull-k8s-images.sh
