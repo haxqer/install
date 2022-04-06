@@ -29,7 +29,8 @@ apt update -y && \
         screen \
         lvm2 \
         socat \
-        ebtables
+        ebtables \
+        nmap
 
 
 

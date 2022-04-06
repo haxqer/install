@@ -25,9 +25,7 @@ w
 ```
 
 
-`partx /dev/sda`
-
-`resize2fs /dev/sda1`
+`partx /dev/sda && resize2fs /dev/sda1`
 
 检查
 
