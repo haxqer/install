@@ -21,15 +21,8 @@ setup_color() {
 
 base_install() {
   apt-get update -y \
-  && apt-get install -y openssl sed
-  mkdir -p /etc/myweb111 \
-  && openssl req -newkey rsa:4096 \
-    -x509 \
-    -sha256 \
-    -days 3650 \
-    -nodes \
-    -out /etc/myweb111/1.crt \
-    -keyout /etc/myweb111/1.key
+  && apt-get install -y sed
+  mkdir -p /etc/myweb111
 }
 
 valid_port(){
@@ -110,8 +103,8 @@ setup_config_file() {
     ],
     "log_level": 1,
     "ssl": {
-        "cert": "/etc/myweb111/1.crt",
-        "key": "/etc/myweb111/1.key",
+        "cert": "/opt/1.crt",
+        "key": "/opt/1.key",
         "key_password": "",
         "cipher": "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384",
         "cipher_tls13": "TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_256_GCM_SHA384",
