@@ -2,14 +2,14 @@
 
 echo "
 
-deb https://mirrors.aliyun.com/debian/ bullseye main non-free contrib
-deb-src https://mirrors.aliyun.com/debian/ bullseye main non-free contrib
-deb https://mirrors.aliyun.com/debian-security/ bullseye-security main
-deb-src https://mirrors.aliyun.com/debian-security/ bullseye-security main
-deb https://mirrors.aliyun.com/debian/ bullseye-updates main non-free contrib
-deb-src https://mirrors.aliyun.com/debian/ bullseye-updates main non-free contrib
-deb https://mirrors.aliyun.com/debian/ bullseye-backports main non-free contrib
-deb-src https://mirrors.aliyun.com/debian/ bullseye-backports main non-free contrib
+deb https://mirrors.ustc.edu.cn/debian/ bullseye main non-free contrib
+deb-src https://mirrors.ustc.edu.cn/debian/ bullseye main non-free contrib
+deb https://mirrors.ustc.edu.cn/debian-security/ bullseye-security main
+deb-src https://mirrors.ustc.edu.cn/debian-security/ bullseye-security main
+deb https://mirrors.ustc.edu.cn/debian/ bullseye-updates main non-free contrib
+deb-src https://mirrors.ustc.edu.cn/debian/ bullseye-updates main non-free contrib
+deb https://mirrors.ustc.edu.cn/debian/ bullseye-backports main non-free contrib
+deb-src https://mirrors.ustc.edu.cn/debian/ bullseye-backports main non-free contrib
 
 " > /etc/apt/sources.list
 
