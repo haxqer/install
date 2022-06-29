@@ -30,6 +30,7 @@ apt update -y && \
         lvm2 \
         socat \
         ebtables \
+        rsync \
         nmap
 
 
