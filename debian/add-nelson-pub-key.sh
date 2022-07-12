@@ -1,0 +1,8 @@
+#!/bin/bash
+
+pub_key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC+9JNkIKoMwCQaFbzrsdzUTq68YnZCuSVa4VdCFE0g3YgvhQdaMBFGjpAHeBR7AyO4QcMIEqaNNGAkUfrFuBYAX+UqI8VRNUg3cwdkRhFgpDTFGLPaEla9BT5dRJEZPnDdkgPyqw4ru1I6YMACPrVXVSfFG9ZlnsUI3+Xoqq6ePX73kSCevOOkdUn1ZyxYeN49NNqEt5e2nX3ayicOx1p9cnUb2viw6qIVzD+3SLByhSqWoww3/OciaLRQF/Sxd9eulQgBlKis2wgMlmKTpMfmhiFI4U1+vG0s93F7cunXCrxosHpuTG4Iuxodxp4nV3UQQ0GylCpHfclZ5a0kukcN yetnelson@gmail.com"
+
+mkdir -p ~/.ssh
+echo ${pub_key} >> ~/.ssh/authorized_keys
+
+
