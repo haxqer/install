@@ -24,7 +24,7 @@ apt update -y && \
         sudo \
         nethogs \
         unzip \
-        polipo \
+        psmisc \
         proxychains \
         screen \
         lvm2 \
