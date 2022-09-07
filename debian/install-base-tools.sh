@@ -3,6 +3,7 @@
 apt update -y && \
     apt install -y \
         htop \
+        build-essential \
         net-tools \
         dnsutils \
         sysstat \
@@ -31,6 +32,7 @@ apt update -y && \
         socat \
         ebtables \
         rsync \
+        etherwake \
         nmap
 
 
