@@ -33,7 +33,11 @@ apt update -y && \
         ebtables \
         rsync \
         etherwake \
-        nmap
+        nmap \
+        nload \
+        iftop \
+        bmon \
+        haproxy
 
 
 
