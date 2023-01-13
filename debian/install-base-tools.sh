@@ -37,6 +37,7 @@ apt update -y && \
         nload \
         iftop \
         bmon \
+        iperf3 \
         haproxy
 
 
