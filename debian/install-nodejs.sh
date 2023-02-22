@@ -7,7 +7,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash 
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
   nvm install --lts && \
   node --version && npm --version && \
-  apt install -y ca-certificates \
+  apt update -y && install -y ca-certificates \
     fonts-liberation \
     libasound2 \
     libatk-bridge2.0-0 \
