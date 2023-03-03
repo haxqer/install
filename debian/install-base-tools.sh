@@ -38,7 +38,9 @@ apt update -y && \
         iftop \
         bmon \
         iperf3 \
-        haproxy
+        haproxy \
+        tmux \
+        xclip
 
 
 
