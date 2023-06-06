@@ -22,7 +22,6 @@ setup_color() {
 base_install() {
   apt-get update -y \
   && apt-get install -y sed
-  mkdir -p /etc/myweb111
 }
 
 valid_port(){
@@ -89,7 +88,8 @@ setup_port_password(){
 }
 
 setup_config_file() {
-  local config_file_path="/etc/myweb111/config.json"
+  mkdir "/etc/myweb${PORT}"
+  local config_file_path="/etc/myweb${PORT}/config.json"
 
   cat > ${config_file_path} <<EOF
 {
@@ -139,9 +139,9 @@ setup_config_file() {
 EOF
   sed -i "s/HAXQER_REPLACE_PORT/${PORT}/g" "${config_file_path}"
   sed -i "s/HAXQER_REPLACE_PASSWORD/${PASSWORD}/g" "${config_file_path}"
-  docker stop myweb111 >/dev/null 2>&1
-  docker rm myweb111 >/dev/null 2>&1
-  docker run -d -p "${PORT}":"${PORT}" --name myweb111 --restart=always -v /etc/myweb111:/etc/myweb111 haxqer/myweb111
+  docker stop myweb${PORT} >/dev/null 2>&1
+  docker rm myweb${PORT} >/dev/null 2>&1
+  docker run -d -p "${PORT}":"${PORT}" --name myweb-${PORT} --restart=always -v /etc/myweb${PORT}:/etc/myweb111 haxqer/myweb111
 }
 
 main(){
