@@ -6,6 +6,10 @@ crontab -r
 /usr/local/qcloud/YunJing/uninst.sh
 /usr/local/qcloud/monitor/barad/admin/uninstall.sh
 
+systemctl stop tat_agent && systemctl disable tat_agent
+rm -f /etc/systemd/system/tat_agent.service
+systemctl daemon-reload && systemctl reset-failed
+
 rm -rf /usr/local/sa
 rm -rf /usr/local/agenttools
 rm -rf /usr/local/qcloud
