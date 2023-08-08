@@ -40,6 +40,8 @@ apt update -y && \
         iperf3 \
         haproxy \
         tmux \
+        gzip \
+        wget \
         xclip
 
 
