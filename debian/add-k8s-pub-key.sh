@@ -1,0 +1,8 @@
+#!/bin/bash
+
+pub_key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCyFEkvdIYvYPNcG52s9vW1uSW2CVt/WJZ6qQxmvCuOMKeT2SlyEN47D7iPz7uF6+6DQvqme6Y69o+reG3S1SvT7tPe2koon4qNzr+42yzUXRmgnH6EbhYFOVsXGnlIj7CTEHlD79a+wzTrLNPMSJ1va36bhFJvTDTOtdTNlKqi52qmP+p7TzGN29rpUs+67opeAYFxOAans5a+viGJiUyBvax4mVBwZsrTqdPJOZvW1QtjSZyyWcD9tD5nVqhCKYBNqOJ9Tlfn78oAZuC3qGX8URq5063HLdSs80AKbLC/hHHbF+cX0gPJyHXxpC/74LenszCHkBbLCs1f6pnbxkoh k8s"
+
+mkdir -p ~/.ssh
+echo ${pub_key} >> ~/.ssh/authorized_keys
+
+
