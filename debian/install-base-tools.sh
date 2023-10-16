@@ -38,11 +38,11 @@ apt update -y && \
         iftop \
         bmon \
         iperf3 \
-        haproxy \
         tmux \
         gzip \
         wget \
         xclip
 
-
+        
+#        haproxy \
 
