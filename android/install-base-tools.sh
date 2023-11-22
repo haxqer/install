@@ -24,6 +24,8 @@ apt update -y && \
         iperf3 \
         tmux \
         gzip \
+        tesseract \
+        opencv \
         wget
 
         
