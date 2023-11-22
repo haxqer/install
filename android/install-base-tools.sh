@@ -24,8 +24,7 @@ apt update -y && \
         iperf3 \
         tmux \
         gzip \
-        wget \
-        xclip
+        wget
 
         
 #        haproxy \
