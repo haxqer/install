@@ -141,7 +141,7 @@ EOF
   sed -i "s/HAXQER_REPLACE_PASSWORD/${PASSWORD}/g" "${config_file_path}"
   docker stop trojan >/dev/null 2>&1
   docker rm trojan >/dev/null 2>&1
-  docker run -d -p "${PORT}":"${PORT}" --name trojan --restart=always -v /etc/trojan:/etc/myweb111 haxqer/myweb111
+  docker run -d -p "${PORT}":"${PORT}" --name trojan --log-opt max-size=50m --log-opt max-file=3 --restart=always -v /etc/trojan:/etc/myweb111 haxqer/myweb111
 }
 
 main(){
