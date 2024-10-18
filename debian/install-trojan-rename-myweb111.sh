@@ -101,7 +101,7 @@ setup_config_file() {
     "password": [
         "HAXQER_REPLACE_PASSWORD"
     ],
-    "log_level": 1,
+    "log_level": 4,
     "ssl": {
         "cert": "/opt/1.crt",
         "key": "/opt/1.key",
