@@ -21,7 +21,7 @@ setup_color() {
 
 base_install() {
   apt-get update -y \
-  && apt-get install -y sed
+  && apt-get install -y sed curl
 }
 
 valid_port(){
@@ -29,7 +29,7 @@ valid_port(){
     local  stat=1
 
     if [[ ${port} =~ ^[0-9]{1,5}$ ]]; then
-        [[ $port -le 65535  ]]
+        [[ $port -le 65535 ]]
         stat=$?
     fi
     return ${stat}
@@ -45,17 +45,32 @@ valid_password(){
     return ${stat}
 }
 
+random_port(){
+  local port=0
+  while true; do
+    port=$(( RANDOM % 55536 + 10000 ))
+    if ! ss -tlnp | grep -q ":${port} " 2>/dev/null; then
+      echo ${port}
+      return
+    fi
+  done
+}
+
 setup_port(){
   local stat=0
   local port=""
 
   while [[ ${stat} == 0 ]]; do
-    printf "${YELLOW}Port:${RESET} "
+    printf "${YELLOW}Port (press Enter for random):${RESET} "
     read port
-    if valid_port ${port} ; then
+    if [[ -z "${port}" ]]; then
+        port=$(random_port)
+        printf "${GREEN}Auto-generated random port: ${BOLD}${port}${RESET}\n"
+        stat=1
+    elif valid_port ${port} ; then
         stat=1
     else
-        printf "${RED}Invalid value enterd: ${BLUE}${port} ${RESET} \n"
+        printf "${RED}Invalid value entered: ${BLUE}${port} ${RESET} \n"
     fi
   done
 
@@ -72,7 +87,7 @@ setup_password(){
     if valid_password ${password} ; then
         stat=1
     else
-        printf "${RED}Invalid value enterd: ${BLUE}${password} ${RESET} \n"
+        printf "${RED}Invalid value entered: ${BLUE}${password} ${RESET} \n"
     fi
   done
 
@@ -82,9 +97,6 @@ setup_password(){
 setup_port_password(){
   setup_port
   setup_password
-
-#  echo ${PORT}
-#  echo ${PASSWORD}
 }
 
 setup_config_file() {
@@ -144,6 +156,29 @@ EOF
   docker run -d -p "${PORT}":"${PORT}" --name myweb-${PORT} --log-opt max-size=5m --log-opt max-file=1 --restart=always -v /etc/myweb${PORT}:/etc/myweb111 haxqer/myweb111
 }
 
+print_clash_config() {
+  local server_ip
+  server_ip=$(curl -s4 ip.sb 2>/dev/null || curl -s4 ifconfig.me 2>/dev/null || echo "YOUR_SERVER_IP")
+
+  echo ""
+  echo "${GREEN}${BOLD}===== Clash Configuration =====${RESET}"
+  echo ""
+  cat <<EOF
+proxies:
+  - name: trojan-${PORT}
+    type: trojan
+    server: ${server_ip}
+    port: ${PORT}
+    password: ${PASSWORD}
+    sni: ""
+    skip-cert-verify: true
+    udp: true
+EOF
+  echo ""
+  echo "${GREEN}${BOLD}===============================${RESET}"
+  echo ""
+}
+
 main(){
   setup_color
 
@@ -161,9 +196,7 @@ main(){
   base_install
   setup_port_password
   setup_config_file
+  print_clash_config
 }
 
 main "$@"
-
-
-
