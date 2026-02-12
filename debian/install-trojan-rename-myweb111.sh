@@ -77,14 +77,22 @@ setup_port(){
   PORT=${port}
 }
 
+random_password(){
+  cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 16
+}
+
 setup_password(){
   local stat=0
   local password=""
 
   while [[ ${stat} == 0 ]]; do
-    printf "${YELLOW}Password:${RESET} "
+    printf "${YELLOW}Password (press Enter for random):${RESET} "
     read password
-    if valid_password ${password} ; then
+    if [[ -z "${password}" ]]; then
+        password=$(random_password)
+        printf "${GREEN}Auto-generated random password: ${BOLD}${password}${RESET}\n"
+        stat=1
+    elif valid_password ${password} ; then
         stat=1
     else
         printf "${RED}Invalid value entered: ${BLUE}${password} ${RESET} \n"
@@ -159,11 +167,28 @@ EOF
 print_clash_config() {
   local server_ip
   server_ip=$(curl -s4 ip.sb 2>/dev/null || curl -s4 ifconfig.me 2>/dev/null || echo "YOUR_SERVER_IP")
+  local clash_file="/etc/myweb${PORT}/clash.yaml"
 
-  echo ""
-  echo "${GREEN}${BOLD}===== Clash Configuration =====${RESET}"
-  echo ""
-  cat <<EOF
+  cat > ${clash_file} <<EOF
+mixed-port: 7890
+allow-lan: true
+bind-address: '*'
+mode: rule
+log-level: info
+external-controller: '127.0.0.1:9090'
+
+dns:
+  enable: true
+  listen: 0.0.0.0:53
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  nameserver:
+    - 8.8.8.8
+    - 1.1.1.1
+  fallback:
+    - tls://8.8.4.4
+    - tls://1.0.0.1
+
 proxies:
   - name: trojan-${PORT}
     type: trojan
@@ -173,9 +198,26 @@ proxies:
     sni: ""
     skip-cert-verify: true
     udp: true
+
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies:
+      - trojan-${PORT}
+      - DIRECT
+
+rules:
+  - GEOIP,LAN,DIRECT
+  - GEOIP,CN,DIRECT
+  - MATCH,PROXY
 EOF
+
   echo ""
-  echo "${GREEN}${BOLD}===============================${RESET}"
+  echo "${GREEN}${BOLD}===== Clash config saved to: ${clash_file} =====${RESET}"
+  echo ""
+  cat ${clash_file}
+  echo ""
+  echo "${GREEN}${BOLD}=================================================${RESET}"
   echo ""
 }
 

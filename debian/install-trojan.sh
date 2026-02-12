@@ -21,7 +21,7 @@ setup_color() {
 
 base_install() {
   apt-get update -y \
-  && apt-get install -y sed
+  && apt-get install -y sed curl
   mkdir -p /etc/trojan
 }
 
@@ -30,7 +30,7 @@ valid_port(){
     local  stat=1
 
     if [[ ${port} =~ ^[0-9]{1,5}$ ]]; then
-        [[ $port -le 65535  ]]
+        [[ $port -le 65535 ]]
         stat=$?
     fi
     return ${stat}
@@ -46,21 +46,40 @@ valid_password(){
     return ${stat}
 }
 
+random_port(){
+  local port=0
+  while true; do
+    port=$(( RANDOM % 55536 + 10000 ))
+    if ! ss -tlnp | grep -q ":${port} " 2>/dev/null; then
+      echo ${port}
+      return
+    fi
+  done
+}
+
 setup_port(){
   local stat=0
   local port=""
 
   while [[ ${stat} == 0 ]]; do
-    printf "${YELLOW}Port:${RESET} "
+    printf "${YELLOW}Port (press Enter for random):${RESET} "
     read port
-    if valid_port ${port} ; then
+    if [[ -z "${port}" ]]; then
+        port=$(random_port)
+        printf "${GREEN}Auto-generated random port: ${BOLD}${port}${RESET}\n"
+        stat=1
+    elif valid_port ${port} ; then
         stat=1
     else
-        printf "${RED}Invalid value enterd: ${BLUE}${port} ${RESET} \n"
+        printf "${RED}Invalid value entered: ${BLUE}${port} ${RESET} \n"
     fi
   done
 
   PORT=${port}
+}
+
+random_password(){
+  cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 16
 }
 
 setup_password(){
@@ -68,12 +87,16 @@ setup_password(){
   local password=""
 
   while [[ ${stat} == 0 ]]; do
-    printf "${YELLOW}Password:${RESET} "
+    printf "${YELLOW}Password (press Enter for random):${RESET} "
     read password
-    if valid_password ${password} ; then
+    if [[ -z "${password}" ]]; then
+        password=$(random_password)
+        printf "${GREEN}Auto-generated random password: ${BOLD}${password}${RESET}\n"
+        stat=1
+    elif valid_password ${password} ; then
         stat=1
     else
-        printf "${RED}Invalid value enterd: ${BLUE}${password} ${RESET} \n"
+        printf "${RED}Invalid value entered: ${BLUE}${password} ${RESET} \n"
     fi
   done
 
@@ -83,9 +106,6 @@ setup_password(){
 setup_port_password(){
   setup_port
   setup_password
-
-#  echo ${PORT}
-#  echo ${PASSWORD}
 }
 
 setup_config_file() {
@@ -144,6 +164,63 @@ EOF
   docker run -d -p "${PORT}":"${PORT}" --name trojan --log-opt max-size=50m --log-opt max-file=3 --restart=always -v /etc/trojan:/etc/myweb111 haxqer/myweb111
 }
 
+print_clash_config() {
+  local server_ip
+  server_ip=$(curl -s4 ip.sb 2>/dev/null || curl -s4 ifconfig.me 2>/dev/null || echo "YOUR_SERVER_IP")
+  local clash_file="/etc/trojan/clash.yaml"
+
+  cat > ${clash_file} <<EOF
+mixed-port: 7890
+allow-lan: true
+bind-address: '*'
+mode: rule
+log-level: info
+external-controller: '127.0.0.1:9090'
+
+dns:
+  enable: true
+  listen: 0.0.0.0:53
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  nameserver:
+    - 8.8.8.8
+    - 1.1.1.1
+  fallback:
+    - tls://8.8.4.4
+    - tls://1.0.0.1
+
+proxies:
+  - name: trojan-${PORT}
+    type: trojan
+    server: ${server_ip}
+    port: ${PORT}
+    password: ${PASSWORD}
+    sni: ""
+    skip-cert-verify: true
+    udp: true
+
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies:
+      - trojan-${PORT}
+      - DIRECT
+
+rules:
+  - GEOIP,LAN,DIRECT
+  - GEOIP,CN,DIRECT
+  - MATCH,PROXY
+EOF
+
+  echo ""
+  echo "${GREEN}${BOLD}===== Clash config saved to: ${clash_file} =====${RESET}"
+  echo ""
+  cat ${clash_file}
+  echo ""
+  echo "${GREEN}${BOLD}=================================================${RESET}"
+  echo ""
+}
+
 main(){
   setup_color
 
@@ -161,9 +238,7 @@ main(){
   base_install
   setup_port_password
   setup_config_file
+  print_clash_config
 }
 
 main "$@"
-
-
-
