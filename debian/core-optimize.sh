@@ -1,56 +1,65 @@
 #!/bin/bash
+# ============================================================================
+# core-optimize.sh - Linux 内核参数调优
+# ============================================================================
 
-# linux 内核调优
+source "$(dirname "$0")/common.sh"
+require_root
 
-# /etc/sysctl.conf 可设置的选项很多，其它选项可以根据自己的环境需要进行设置
+# ─── 内核参数调优 ──────────────────────────────────────────────────────────
+SYSCTL_MARKER="# === haxqer core-optimize ==="
 
-echo "
-#该参数设置系统的TIME_WAIT的数量，如果超过默认值则会被立即清除
+if grep -q "${SYSCTL_MARKER}" /etc/sysctl.conf 2>/dev/null; then
+    log_warn "/etc/sysctl.conf 已包含优化配置，跳过"
+else
+    log_info "写入内核参数到 /etc/sysctl.conf..."
+    cat >> /etc/sysctl.conf <<EOF
+
+${SYSCTL_MARKER}
+# TIME_WAIT 数量上限
 net.ipv4.tcp_max_tw_buckets = 20000
-#定义了系统中每一个端口最大的监听队列的长度，这是个全局的参数
+# 全局监听队列最大长度
 net.core.somaxconn = 65535
-#对于还未获得对方确认的连接请求，可保存在队列中的最大数目
+# 未确认连接请求队列最大数目
 net.ipv4.tcp_max_syn_backlog = 262144
-#在每个网络接口接收数据包的速率比内核处理这些包的速率快时，允许送到队列的数据包的最大数目
+# 网络接口接收队列最大数目
 net.core.netdev_max_backlog = 30000
-#能够更快地回收TIME-WAIT套接字。此选项会导致处于NAT网络的客户端超时，建议为0
-net.ipv4.tcp_tw_recycle = 0
-#系统所有进程一共可以打开的文件数量
+# 系统所有进程可打开文件数
 fs.file-max = 6815744
-#防火墙跟踪表的大小。注意：如果防火墙没开则会提示error: \"net.netfilter.nf_conntrack_max\" is an unknown key，忽略即可
+# 防火墙跟踪表大小 (防火墙未开启时会报错，可忽略)
 net.netfilter.nf_conntrack_max = 2621440
-" >> /etc/sysctl.conf
+EOF
+    sysctl -p || true
+fi
 
-sysctl -p
+# ─── 打开文件数优化 ────────────────────────────────────────────────────────
+PROFILE_MARKER="# === haxqer ulimit ==="
 
+if grep -q "${PROFILE_MARKER}" /etc/profile 2>/dev/null; then
+    log_warn "/etc/profile 已包含 ulimit 配置，跳过"
+else
+    log_info "写入 ulimit 配置到 /etc/profile..."
+    cat >> /etc/profile <<EOF
 
-
-# 打开文件数
-# 设置系统打开文件数设置，解决高并发下 too many open files 问题。此选项直接影响单个进程容纳的客户端连接数。
-# Soft open files 是Linux系统参数，影响系统单个进程能够打开最大的文件句柄数量，这个值会影响到长连接应用如聊天中单个进程能够维持的用户连接数，
-# 运行ulimit -n能看到这个参数值，如果是1024，就是代表单个进程只能同时最多只能维持1024甚至更少（因为有其它文件的句柄被打开）。
-# 如果开启4个进程维持用户连接，那么整个应用能够同时维持的连接数不会超过4*1024个，
-# 也就是说最多只能支持4x1024个用户在线可以增大这个设置以便服务能够维持更多的TCP连接。
-
-
-# 在/etc/profile文件末尾添加一行ulimit -HSn 102400，这样每次登录终端时，都会自动执行/etc/profile。
-
-echo "
+${PROFILE_MARKER}
 ulimit -HSn 102400
-" >> /etc/profile
+EOF
+fi
 
-# 令修改open files的数值永久生效，则必须修改配置文件：/etc/security/limits.conf. 在这个文件后加上相应的配置，这种方法需要重启机器才能生效
+LIMITS_MARKER="# === haxqer limits ==="
 
-echo "
+if grep -q "${LIMITS_MARKER}" /etc/security/limits.conf 2>/dev/null; then
+    log_warn "/etc/security/limits.conf 已包含配置，跳过"
+else
+    log_info "写入 limits 配置到 /etc/security/limits.conf..."
+    cat >> /etc/security/limits.conf <<EOF
+
+${LIMITS_MARKER}
 * soft nofile 1024000
 * hard nofile 1024000
 root soft nofile 1024000
 root hard nofile 1024000
-" >> /etc/security/limits.conf
+EOF
+fi
 
-
-
-
-
-
-
+log_info "✅ 内核优化完成"

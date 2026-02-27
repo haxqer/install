@@ -1,34 +1,27 @@
 #!/bin/bash
+# ============================================================================
+# install-trojan.sh - 安装 Trojan 代理服务 (Docker 方式)
+#
+# 用法:
+#   install-trojan.sh            单实例模式 (配置存放 /etc/trojan/)
+#   install-trojan.sh --multi    多实例模式 (配置存放 /etc/myweb${PORT}/)
+# ============================================================================
 
-setup_color() {
-	# Only use colors if connected to a terminal
-	if [[ -t 1 ]]; then
-		RED=$(printf '\033[31m')
-		GREEN=$(printf '\033[32m')
-		YELLOW=$(printf '\033[33m')
-		BLUE=$(printf '\033[34m')
-		BOLD=$(printf '\033[1m')
-		RESET=$(printf '\033[m')
-	else
-		RED=""
-		GREEN=""
-		YELLOW=""
-		BLUE=""
-		BOLD=""
-		RESET=""
-	fi
-}
+source "$(dirname "$0")/common.sh"
+
+MULTI_MODE=false
+if [[ "${1:-}" == "--multi" ]]; then
+    MULTI_MODE=true
+fi
 
 base_install() {
-  apt-get update -y \
-  && apt-get install -y sed curl
-  mkdir -p /etc/trojan
+    apt-get update -y \
+    && apt-get install -y sed curl
 }
 
-valid_port(){
-    local  port=$1
-    local  stat=1
-
+valid_port() {
+    local port=$1
+    local stat=1
     if [[ ${port} =~ ^[0-9]{1,5}$ ]]; then
         [[ $port -le 65535 ]]
         stat=$?
@@ -36,90 +29,109 @@ valid_port(){
     return ${stat}
 }
 
-valid_password(){
-    local  password=$1
-    local  stat=1
-
+valid_password() {
+    local password=$1
+    local stat=1
     if [[ ${password} =~ ^[0-9a-zA-Z*#_\&-]{1,40}$ ]]; then
         stat=$?
     fi
     return ${stat}
 }
 
-random_port(){
-  local port=0
-  while true; do
-    port=$(( RANDOM % 55536 + 10000 ))
-    if ! ss -tlnp | grep -q ":${port} " 2>/dev/null; then
-      echo ${port}
-      return
-    fi
-  done
+random_port() {
+    local port=0
+    while true; do
+        port=$(( RANDOM % 55536 + 10000 ))
+        if ! ss -tlnp | grep -q ":${port} " 2>/dev/null; then
+            echo ${port}
+            return
+        fi
+    done
 }
 
-setup_port(){
-  local stat=0
-  local port=""
+setup_port() {
+    local stat=0
+    local port=""
 
-  while [[ ${stat} == 0 ]]; do
-    printf "${YELLOW}Port (press Enter for random):${RESET} "
-    read port
-    if [[ -z "${port}" ]]; then
-        port=$(random_port)
-        printf "${GREEN}Auto-generated random port: ${BOLD}${port}${RESET}\n"
-        stat=1
-    elif valid_port ${port} ; then
-        stat=1
-    else
-        printf "${RED}Invalid value entered: ${BLUE}${port} ${RESET} \n"
-    fi
-  done
+    while [[ ${stat} == 0 ]]; do
+        printf "${YELLOW}Port (press Enter for random):${RESET} "
+        read -r port
+        if [[ -z "${port}" ]]; then
+            port=$(random_port)
+            printf "${GREEN}Auto-generated random port: ${BOLD}${port}${RESET}\n"
+            stat=1
+        elif valid_port "${port}"; then
+            stat=1
+        else
+            printf "${RED}Invalid value entered: ${BLUE}${port} ${RESET} \n"
+        fi
+    done
 
-  PORT=${port}
+    PORT=${port}
 }
 
-random_password(){
-  cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 16
+random_password() {
+    tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 16
 }
 
-setup_password(){
-  local stat=0
-  local password=""
+setup_password() {
+    local stat=0
+    local password=""
 
-  while [[ ${stat} == 0 ]]; do
-    printf "${YELLOW}Password (press Enter for random):${RESET} "
-    read password
-    if [[ -z "${password}" ]]; then
-        password=$(random_password)
-        printf "${GREEN}Auto-generated random password: ${BOLD}${password}${RESET}\n"
-        stat=1
-    elif valid_password ${password} ; then
-        stat=1
-    else
-        printf "${RED}Invalid value entered: ${BLUE}${password} ${RESET} \n"
-    fi
-  done
+    while [[ ${stat} == 0 ]]; do
+        printf "${YELLOW}Password (press Enter for random):${RESET} "
+        read -r password
+        if [[ -z "${password}" ]]; then
+            password=$(random_password)
+            printf "${GREEN}Auto-generated random password: ${BOLD}${password}${RESET}\n"
+            stat=1
+        elif valid_password "${password}"; then
+            stat=1
+        else
+            printf "${RED}Invalid value entered: ${BLUE}${password} ${RESET} \n"
+        fi
+    done
 
-  PASSWORD=${password}
+    PASSWORD=${password}
 }
 
-setup_port_password(){
-  setup_port
-  setup_password
+setup_port_password() {
+    setup_port
+    setup_password
 }
 
 setup_config_file() {
-  local config_file_path="/etc/trojan/config.json"
+    local config_dir
+    local container_name
+    local db_name="trojan"
+    local db_user="trojan"
+    local log_max_size="50m"
+    local log_max_file="3"
 
-  cat > ${config_file_path} <<EOF
+    if [[ "$MULTI_MODE" == true ]]; then
+        config_dir="/etc/myweb${PORT}"
+        container_name="myweb-${PORT}"
+        db_name="myweb111"
+        db_user="myweb111"
+        log_max_size="5m"
+        log_max_file="1"
+    else
+        config_dir="/etc/trojan"
+        container_name="trojan"
+    fi
+
+    mkdir -p "${config_dir}"
+    local config_file_path="${config_dir}/config.json"
+
+    cat > "${config_file_path}" <<EOF
 {
     "run_type": "server",
     "local_addr": "0.0.0.0",
-    "local_port": HAXQER_REPLACE_PORT,
+    "local_port": ${PORT},
     "remote_addr": "127.0.0.1",
     "remote_port": 11111,
     "password": [
-        "HAXQER_REPLACE_PASSWORD"
+        "${PASSWORD}"
     ],
     "log_level": 4,
     "ssl": {
@@ -151,25 +163,38 @@ setup_config_file() {
         "enabled": false,
         "server_addr": "127.0.0.1",
         "server_port": 3306,
-        "database": "trojan",
-        "username": "trojan",
+        "database": "${db_name}",
+        "username": "${db_user}",
         "password": ""
     }
 }
 EOF
-  sed -i "s/HAXQER_REPLACE_PORT/${PORT}/g" "${config_file_path}"
-  sed -i "s/HAXQER_REPLACE_PASSWORD/${PASSWORD}/g" "${config_file_path}"
-  docker stop trojan >/dev/null 2>&1
-  docker rm trojan >/dev/null 2>&1
-  docker run -d -p "${PORT}":"${PORT}" --name trojan --log-opt max-size=50m --log-opt max-file=3 --restart=always -v /etc/trojan:/etc/myweb111 haxqer/myweb111
+
+    docker stop "${container_name}" >/dev/null 2>&1 || true
+    docker rm "${container_name}" >/dev/null 2>&1 || true
+    docker run -d \
+        -p "${PORT}":"${PORT}" \
+        --name "${container_name}" \
+        --log-opt max-size="${log_max_size}" \
+        --log-opt max-file="${log_max_file}" \
+        --restart=always \
+        -v "${config_dir}":/etc/myweb111 \
+        haxqer/myweb111
 }
 
 print_clash_config() {
-  local server_ip
-  server_ip=$(curl -s4 ip.sb 2>/dev/null || curl -s4 ifconfig.me 2>/dev/null || echo "YOUR_SERVER_IP")
-  local clash_file="/etc/trojan/clash.yaml"
+    local server_ip
+    server_ip=$(curl -s4 ip.sb 2>/dev/null || curl -s4 ifconfig.me 2>/dev/null || echo "YOUR_SERVER_IP")
 
-  cat > ${clash_file} <<EOF
+    local config_dir
+    if [[ "$MULTI_MODE" == true ]]; then
+        config_dir="/etc/myweb${PORT}"
+    else
+        config_dir="/etc/trojan"
+    fi
+    local clash_file="${config_dir}/clash.yaml"
+
+    cat > "${clash_file}" <<EOF
 mixed-port: 7890
 allow-lan: true
 bind-address: '*'
@@ -212,33 +237,30 @@ rules:
   - MATCH,PROXY
 EOF
 
-  echo ""
-  echo "${GREEN}${BOLD}===== Clash config saved to: ${clash_file} =====${RESET}"
-  echo ""
-  cat ${clash_file}
-  echo ""
-  echo "${GREEN}${BOLD}=================================================${RESET}"
-  echo ""
+    echo ""
+    echo "${GREEN}${BOLD}===== Clash config saved to: ${clash_file} =====${RESET}"
+    echo ""
+    cat "${clash_file}"
+    echo ""
+    echo "${GREEN}${BOLD}=================================================${RESET}"
+    echo ""
 }
 
-main(){
-  setup_color
+main() {
+    echo "${BLUE}Time to set your trojan:${RESET}"
 
-  echo "${BLUE}Time to set your trojan:${RESET}"
-
-  # Prompt for user choice on changing the ip configure
-  printf "${YELLOW}Do you want to set your trojan? [Y/n]${RESET} "
-  read opt
+    printf "${YELLOW}Do you want to set your trojan? [Y/n]${RESET} "
+    read -r opt
     case $opt in
-    y*|Y*|"") echo "Set trojan..." ;;
-    n*|N*) echo "Trojan setting skipped."; return ;;
-    *) echo "Invalid choice. Trojan setting skipped."; return ;;
-  esac
+        y*|Y*|"") echo "Set trojan..." ;;
+        n*|N*) echo "Trojan setting skipped."; return ;;
+        *) echo "Invalid choice. Trojan setting skipped."; return ;;
+    esac
 
-  base_install
-  setup_port_password
-  setup_config_file
-  print_clash_config
+    base_install
+    setup_port_password
+    setup_config_file
+    print_clash_config
 }
 
 main "$@"

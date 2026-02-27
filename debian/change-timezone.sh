@@ -1,5 +1,10 @@
 #!/bin/bash
+# ============================================================================
+# change-timezone.sh - 配置系统时区
+# ============================================================================
 
-# graphic configure
+source "$(dirname "$0")/common.sh"
+require_root
+
+log_info "配置时区 (请在交互界面中选择)..."
 dpkg-reconfigure tzdata
-

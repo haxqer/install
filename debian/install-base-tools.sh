@@ -1,4 +1,12 @@
 #!/bin/bash
+# ============================================================================
+# install-base-tools.sh - 安装基础工具包
+# ============================================================================
+
+source "$(dirname "$0")/common.sh"
+require_root
+
+log_info "正在安装基础工具包..."
 
 apt update -y && \
     apt install -y \
@@ -11,7 +19,6 @@ apt update -y && \
         git \
         tree \
         zsh \
-        htop \
         curl \
         vim \
         conntrack \
@@ -43,6 +50,4 @@ apt update -y && \
         wget \
         xclip
 
-        
-#        haproxy \
-
+log_info "✅ 基础工具包安装完成"

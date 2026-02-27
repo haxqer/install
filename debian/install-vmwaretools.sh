@@ -1,18 +1,12 @@
 #!/bin/bash
+# ============================================================================
+# install-vmwaretools.sh - 安装 VMware Tools (open-vm-tools)
+# ============================================================================
 
-#TOOL_PATH=/tmp/vmwaretools
-#
-#
-#mkdir /mnt/cdrom
-#mount /dev/cdrom  /mnt/cdrom
-#mkdir ${TOOL_PATH}
-#tar xzf /mnt/cdrom/VMwareTools-*.tar.gz -C ${TOOL_PATH}/ --strip-components 1
-#${TOOL_PATH}/vmware-install.pl
+source "$(dirname "$0")/common.sh"
+require_root
 
+log_info "正在安装 open-vm-tools..."
+apt update -y && apt install -y open-vm-tools
 
-apt update -y && \
-    apt install -y \
-        open-vm-tools
-
-
-
+log_info "✅ VMware Tools 安装完成"

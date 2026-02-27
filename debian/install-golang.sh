@@ -1,9 +1,9 @@
 #!/bin/bash
 # shellcheck disable=SC2016
-set -e
+source "$(dirname "$0")/common.sh"
 
 tempurl="$(wget -qO- https://golang.org/dl/ | grep -oP '\/dl\/go([0-9\.]+)\.linux-amd64\.tar\.gz' | head -n 1 )"
-VERSION="$(echo tempurl | grep -oP 'go[0-9\.]+' | grep -oP '[0-9\.]+' | head -c -2 )"
+VERSION="$(echo "$tempurl" | grep -oP 'go[0-9\.]+' | grep -oP '[0-9\.]+' | head -c -2 )"
 DOWNLOAD_URL="https://go.dev"${tempurl}
 
 [ -z "$GOROOT" ] && GOROOT="$HOME/.go"
