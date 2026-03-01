@@ -3,15 +3,15 @@
 # install-trojan.sh - 安装 Trojan 代理服务 (Docker 方式)
 #
 # 用法:
-#   install-trojan.sh            单实例模式 (配置存放 /etc/trojan/)
-#   install-trojan.sh --multi    多实例模式 (配置存放 /etc/myweb${PORT}/)
+#   install-trojan.sh            多实例模式 (配置存放 /etc/myweb${PORT}/)
+#   install-trojan.sh --single   单实例模式 (配置存放 /etc/trojan/)
 # ============================================================================
 
 source "$(dirname "$0")/common.sh"
 
-MULTI_MODE=false
-if [[ "${1:-}" == "--multi" ]]; then
-    MULTI_MODE=true
+MULTI_MODE=true
+if [[ "${1:-}" == "--single" ]]; then
+    MULTI_MODE=false
 fi
 
 base_install() {
@@ -71,7 +71,7 @@ setup_port() {
 }
 
 random_password() {
-    tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 16
+    LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 16 || true
 }
 
 setup_password() {
