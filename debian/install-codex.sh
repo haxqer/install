@@ -77,7 +77,7 @@ log_info "已写入 $AUTH_FILE"
 CONFIG_FILE="$CODEX_DIR/config.toml"
 cat > "$CONFIG_FILE" <<EOF
 model_provider = "hax"
-model = "gpt-5.3-codex"
+model = "gpt-5.4"
 disable_response_storage = true
 model_reasoning_effort = "xhigh"
 
