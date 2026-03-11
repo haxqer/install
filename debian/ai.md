@@ -7,6 +7,7 @@
 ## openclaw
 
 安装过程中可以先不管模型配置，安装完成后，直接去编辑配置文件 ~/.openclaw/openclaw.json
+
 其中模型配置部分 models 直接使用这个，其中 sk-xxxx 替换成你的密钥
 
 ```json
