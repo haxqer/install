@@ -58,3 +58,48 @@
       }
     }
 ```
+
+## opencode
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "hax": {
+      "npm": "@ai-sdk/openai",
+      "name": "hax",
+      "options": {
+        "baseURL": "https://aiapiv2.xgit.fun/v1"
+      },
+      "models": {
+        "gpt-5.4": {
+          "name": "GPT-5.4",
+          "thinking": true,
+          "modalities": {
+            "input": ["text", "image", "pdf"],
+            "output": ["text"]
+          },
+          "limit": {
+            "context": 400000,
+            "output": 128000
+          },
+          "options": {
+            "store": false,
+            "reasoningEffort": "xhigh",
+            "textVerbosity": "high",
+            "reasoningSummary": "auto",
+            "include": ["reasoning.encrypted_content"]
+          }
+        },
+        "gpt-5.3-codex": {
+          "name": "GPT-5.3 Codex",
+          "options": {
+            "include": ["reasoning.encrypted_content"],
+            "store": false
+          }
+        }
+      }
+    }
+  }
+}
+```
