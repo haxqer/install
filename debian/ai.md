@@ -61,6 +61,8 @@
 
 ## opencode
 
+`~/.config/opencode/opencode.json`:
+
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
@@ -100,6 +102,17 @@
         }
       }
     }
+  }
+}
+```
+
+`~/.local/share/opencode/auth.json`:
+
+```json
+{
+  "供应商名称": {
+    "type": "api",
+    "key": "你的API密钥"
   }
 }
 ```
